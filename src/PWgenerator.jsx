@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useState , useCallback} from 'react';
 
 function PWgenerator() {
@@ -21,11 +21,21 @@ function PWgenerator() {
       setPassword(pass)
 
     }, [length , Number , Char])
+    
+    // this operation can be done without useref but it gives more control over the code
+    const copyToclipboard  = useCallback(()=>{
+      passwordRef.current?.select(); //to optimize view ....this will select the password on copying
+      passwordRef.current?.setSelectionRaange(0,10); //only select the 10 char of password
+      window.navigator.clipboard.writeText(password) // 
+    },[password])
+    //here callback is used for optimization /optional
 
     useEffect(()=>{
       passwordGenerator()
 
     }, [length , Number , Char])
+
+    const passwordRef = useRef(null);      // used here to get the reference of password from input field
 
       
     
@@ -33,8 +43,8 @@ function PWgenerator() {
     <div>
         <h1>PW Generator</h1>
         <div>
-          <input type="text" value={password} placeholder="password" readOnly/>
-          <button>copy</button>
+          <input type="text" value={password} placeholder="password" readOnly ref={passwordRef}/>
+          <button onClick={copyToclipboard}>copy</button>
         </div>
         <div style={{display:"flex"}}>
           <input type="range" min={6} max={60} value={length} onChange={(e) => {setLength(e.target.value)}}></input>
